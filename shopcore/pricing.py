@@ -50,3 +50,9 @@ def calculate_tax(amount: Decimal) -> Decimal:
 
 def calculate_tax_copy(amount: Decimal) -> Decimal:
     return money(amount * Decimal("0.07"))
+
+
+def calculate_tax_renamed(base_amount: Decimal) -> Decimal:
+    computed_tax = base_amount * Decimal("0.07")
+    normalized_tax = money(computed_tax)
+    return normalized_tax
