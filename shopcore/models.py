@@ -10,6 +10,7 @@ class User:
     user_id: str
     email: str
     role: str = "customer"
+    password_hash: str = ""
 
 
 @dataclass(frozen=True)

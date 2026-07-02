@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from .auth import AuthService
 from .models import CartItem, CheckoutResult, Order, PaymentResult, Product, User
 from .utils import current_timestamp, money, stable_identifier
 from .validators import validate_cart_items, validate_email
@@ -11,12 +12,17 @@ class ShopApplication:
     def __init__(self) -> None:
         self.products: dict[str, Product] = {}
         self.users: dict[str, User] = {}
+        self.auth = AuthService()
 
     def seed_product(self, product: Product) -> None:
         self.products[product.sku] = product
 
     def seed_user(self, user: User) -> None:
         self.users[user.user_id] = user
+        self.auth.register_user(user)
+
+    def authenticate(self, email: str, password: str) -> str:
+        return self.auth.authenticate(email=email, password=password)
 
     def checkout(
         self,
