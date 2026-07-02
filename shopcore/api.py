@@ -3,6 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from .auth import AuthService
+from .cart import CartService
 from .inventory import InventoryService
 from .models import CartItem, CheckoutResult, Order, PaymentResult, Product, User
 from .invoice import InvoiceService
@@ -19,6 +20,7 @@ class ShopApplication:
         self.products: dict[str, Product] = {}
         self.users: dict[str, User] = {}
         self.auth = AuthService()
+        self.cart = CartService()
         self.inventory = InventoryService()
         self.pricing = PricingService()
         self.payments = PaymentService()
@@ -51,8 +53,9 @@ class ShopApplication:
     ) -> CheckoutResult:
         validate_email(email)
         validate_cart_items(cart_items)
+        cart_summary = self.cart.summarize(cart_items)
         self.inventory.reserve(cart_items)
-        shipping_quote = self.shipping.quote(shipping_country=shipping_country, item_count=len(cart_items))
+        shipping_quote = self.shipping.quote(shipping_country=shipping_country, item_count=cart_summary.item_count)
         breakdown = self.pricing.calculate(
             cart_items=cart_items,
             shipping_country=shipping_country,
@@ -78,6 +81,7 @@ class ShopApplication:
                 "shipping_country": shipping_country,
                 "payment_method": payment_method,
                 "shipping_method": shipping_quote.method,
+                "item_count": cart_summary.item_count,
             },
         )
         self.notifications.send_confirmation(email=email, order_id=order_id, invoice_number=invoice_number)
