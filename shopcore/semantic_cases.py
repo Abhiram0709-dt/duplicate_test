@@ -107,3 +107,28 @@ def build_extended_order_report(order_id: str, cart_items: list[str], shipping_c
         "risk_score": risk_score,
         "prefix_count": len(prefix_list),
     }
+
+
+def calculate_tax_summary(amount: Decimal) -> dict[str, object]:
+    tax_amount = money(amount * Decimal("0.07"))
+    return {
+        "tax_amount": tax_amount,
+        "rate_label": "standard",
+        "explanation": "tax summary for reporting",
+    }
+
+
+def calculate_tax_total(amount: Decimal) -> Decimal:
+    return money(amount * Decimal("0.07"))
+
+
+def process_order_review(order_id: str) -> dict[str, str]:
+    return {
+        "order_id": order_id,
+        "status": "under-review",
+        "next_step": "manual-check",
+    }
+
+
+def process_order_refund(order_id: str) -> str:
+    return f"refund-issued:{order_id}"
