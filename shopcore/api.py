@@ -6,6 +6,7 @@ from .auth import AuthService
 from .audit import AuditTrail, build_checkout_audit
 from .cart import CartService
 from .cache import PricingCache
+from .batch import BatchCheckoutService
 from .inventory import InventoryService
 from .models import CartItem, CheckoutResult, Order, PaymentResult, Product, User
 from .invoice import InvoiceService
@@ -25,6 +26,7 @@ class ShopApplication:
         self.audit = AuditTrail()
         self.cart = CartService()
         self.preview_cache = PricingCache()
+        self.batch_checkout = BatchCheckoutService()
         self.inventory = InventoryService()
         self.pricing = PricingService()
         self.payments = PaymentService()
@@ -124,4 +126,16 @@ class ShopApplication:
         self.notifications.send_confirmation(email=email, order_id=order_id, invoice_number=invoice_number)
         self.audit.record(build_checkout_audit(order=order, payment=payment, invoice_number=invoice_number))
         return CheckoutResult(order=order, payment=payment, invoice_number=invoice_number)
+
+    def preview_bulk_checkout(
+        self,
+        cart_groups: list[list[CartItem]],
+        shipping_country: str,
+        promotion_code: str | None = None,
+    ) -> dict[str, object]:
+        return self.batch_checkout.preview_batch(
+            cart_groups=cart_groups,
+            shipping_country=shipping_country,
+            promotion_code=promotion_code,
+        )
 
