@@ -3,6 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from .auth import AuthService
+from .audit import AuditTrail, build_checkout_audit
 from .cart import CartService
 from .inventory import InventoryService
 from .models import CartItem, CheckoutResult, Order, PaymentResult, Product, User
@@ -20,6 +21,7 @@ class ShopApplication:
         self.products: dict[str, Product] = {}
         self.users: dict[str, User] = {}
         self.auth = AuthService()
+        self.audit = AuditTrail()
         self.cart = CartService()
         self.inventory = InventoryService()
         self.pricing = PricingService()
@@ -109,5 +111,6 @@ class ShopApplication:
             },
         )
         self.notifications.send_confirmation(email=email, order_id=order_id, invoice_number=invoice_number)
+        self.audit.record(build_checkout_audit(order=order, payment=payment, invoice_number=invoice_number))
         return CheckoutResult(order=order, payment=payment, invoice_number=invoice_number)
 
