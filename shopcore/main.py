@@ -10,6 +10,8 @@ def build_demo_application() -> ShopApplication:
     app = ShopApplication()
     app.seed_product(Product(sku="SKU-RED-01", name="Red Notebook", unit_price=money(12.50)))
     app.seed_product(Product(sku="SKU-USB-02", name="USB-C Cable", unit_price=money(8.99)))
+    app.seed_stock("SKU-RED-01", 10)
+    app.seed_stock("SKU-USB-02", 10)
     app.seed_user(
         User(
             user_id="user-100",

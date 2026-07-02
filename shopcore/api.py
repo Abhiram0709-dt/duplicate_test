@@ -3,6 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from .auth import AuthService
+from .inventory import InventoryService
 from .models import CartItem, CheckoutResult, Order, PaymentResult, Product, User
 from .utils import current_timestamp, money, stable_identifier
 from .validators import validate_cart_items, validate_email
@@ -13,9 +14,14 @@ class ShopApplication:
         self.products: dict[str, Product] = {}
         self.users: dict[str, User] = {}
         self.auth = AuthService()
+        self.inventory = InventoryService()
 
     def seed_product(self, product: Product) -> None:
         self.products[product.sku] = product
+        self.inventory.add_stock(product.sku, 0)
+
+    def seed_stock(self, sku: str, quantity: int) -> None:
+        self.inventory.add_stock(sku, quantity)
 
     def seed_user(self, user: User) -> None:
         self.users[user.user_id] = user
@@ -34,6 +40,7 @@ class ShopApplication:
     ) -> CheckoutResult:
         validate_email(email)
         validate_cart_items(cart_items)
+        self.inventory.reserve(cart_items)
 
         subtotal = sum((item.line_total for item in cart_items), start=Decimal("0.00"))
         shipping_fee = money("5.00" if shipping_country == "US" else "15.00")
