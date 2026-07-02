@@ -88,3 +88,22 @@ def collect_sku_prefixes_with_loop(skus: list[str]) -> list[str]:
         if sku:
             prefixes.append(sku[:3])
     return prefixes
+
+
+def build_extended_order_report(order_id: str, cart_items: list[str], shipping_country: str) -> dict[str, object]:
+    cart_count = count_cart_items_with_while(cart_items)
+    prefix_list = collect_sku_prefixes_with_loop(cart_items)
+    shipping_label = "domestic" if shipping_country == "US" else "international"
+
+    risk_score = 0
+    for sku_prefix in prefix_list:
+        if sku_prefix.startswith("SKU"):
+            risk_score += 1
+
+    return {
+        "order_id": order_id,
+        "cart_count": cart_count,
+        "shipping_label": shipping_label,
+        "risk_score": risk_score,
+        "prefix_count": len(prefix_list),
+    }
