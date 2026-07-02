@@ -6,6 +6,7 @@ from .auth import AuthService
 from .inventory import InventoryService
 from .models import CartItem, CheckoutResult, Order, PaymentResult, Product, User
 from .pricing import PricingService
+from .payment import PaymentService
 from .utils import current_timestamp, money, stable_identifier
 from .validators import validate_cart_items, validate_email
 
@@ -17,6 +18,7 @@ class ShopApplication:
         self.auth = AuthService()
         self.inventory = InventoryService()
         self.pricing = PricingService()
+        self.payments = PaymentService()
 
     def seed_product(self, product: Product) -> None:
         self.products[product.sku] = product
@@ -51,7 +53,7 @@ class ShopApplication:
         )
 
         order_id = stable_identifier(customer_id, email, current_timestamp())
-        transaction_id = stable_identifier(order_id, payment_method, "payment")
+        payment = self.payments.capture(order_id=order_id, amount=breakdown.grand_total, payment_method=payment_method)
         invoice_number = f"INV-{order_id.upper()}"
 
         order = Order(
@@ -69,5 +71,4 @@ class ShopApplication:
                 "payment_method": payment_method,
             },
         )
-        payment = PaymentResult(approved=True, transaction_id=transaction_id, captured_amount=breakdown.grand_total)
         return CheckoutResult(order=order, payment=payment, invoice_number=invoice_number)
