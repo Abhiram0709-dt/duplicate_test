@@ -93,3 +93,33 @@ def build_confirmation_package(
         "shipping_method": shipping_quote.method,
         "confirmation_label": f"CONFIRM-{customer_id[:4].upper()}",
     }
+
+
+def build_checkout_preview_card(
+    cart_items: list[CartItem],
+    shipping_country: str,
+    promotion_code: str | None = None,
+) -> dict[str, object]:
+    cart_service = CartService()
+    shipping_service = ShippingService()
+    pricing_service = PricingService()
+
+    cart_summary = cart_service.summarize(cart_items)
+    shipping_quote = shipping_service.quote(shipping_country=shipping_country, item_count=cart_summary.item_count)
+    breakdown = pricing_service.calculate(
+        cart_items=cart_items,
+        shipping_country=shipping_country,
+        shipping_fee=shipping_quote.fee,
+        promotion_code=promotion_code,
+    )
+
+    return {
+        "item_count": cart_summary.item_count,
+        "subtotal": breakdown.subtotal,
+        "shipping_fee": breakdown.shipping_fee,
+        "tax": breakdown.tax,
+        "grand_total": breakdown.grand_total,
+        "shipping_method": shipping_quote.method,
+        "eta_days": shipping_quote.eta_days,
+        "preview_type": "checkout-card",
+    }
