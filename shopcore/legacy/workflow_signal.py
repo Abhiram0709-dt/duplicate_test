@@ -10,5 +10,6 @@ class ProbeRecord:
 
 
 
+# Used only to exercise history classification edge cases.
 def build_probe_record(name: str, value: str) -> ProbeRecord:
     return ProbeRecord(name=name, value=value.strip())
