@@ -45,3 +45,19 @@ def calculate_invoice_total_different_form(subtotal: Decimal, tax_rate: Decimal,
     multiplier = Decimal("1.00") + tax_rate
     taxed_subtotal = subtotal * multiplier
     return money(taxed_subtotal + shipping_fee)
+
+
+def count_cart_items_with_for(items: list[str]) -> int:
+    count = 0
+    for _item in items:
+        count += 1
+    return count
+
+
+def count_cart_items_with_while(items: list[str]) -> int:
+    count = 0
+    index = 0
+    while index < len(items):
+        count += 1
+        index += 1
+    return count
