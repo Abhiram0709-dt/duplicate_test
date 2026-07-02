@@ -55,3 +55,41 @@ def build_receipt_snapshot(
         "shipping_method": shipping_quote.method,
         "shipping_country": shipping_country,
     }
+
+
+def build_confirmation_package(
+    customer_id: str,
+    cart_items: list[CartItem],
+    shipping_country: str,
+    promotion_code: str | None = None,
+) -> dict[str, object]:
+    cart_service = CartService()
+    shipping_service = ShippingService()
+    pricing_service = PricingService()
+
+    cart_summary = cart_service.summarize(cart_items)
+    shipping_quote = shipping_service.quote(shipping_country=shipping_country, item_count=cart_summary.item_count)
+    breakdown = pricing_service.calculate(
+        cart_items=cart_items,
+        shipping_country=shipping_country,
+        shipping_fee=shipping_quote.fee,
+        promotion_code=promotion_code,
+    )
+
+    totals = {
+        "subtotal": breakdown.subtotal,
+        "shipping_fee": breakdown.shipping_fee,
+        "tax": breakdown.tax,
+        "grand_total": breakdown.grand_total,
+    }
+    customer = {
+        "customer_id": customer_id,
+        "item_count": cart_summary.item_count,
+        "shipping_country": shipping_country,
+    }
+    return {
+        "customer": customer,
+        "totals": totals,
+        "shipping_method": shipping_quote.method,
+        "confirmation_label": f"CONFIRM-{customer_id[:4].upper()}",
+    }
