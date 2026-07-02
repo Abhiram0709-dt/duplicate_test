@@ -5,6 +5,7 @@ from decimal import Decimal
 from .auth import AuthService
 from .audit import AuditTrail, build_checkout_audit
 from .cart import CartService
+from .cache import PricingCache
 from .inventory import InventoryService
 from .models import CartItem, CheckoutResult, Order, PaymentResult, Product, User
 from .invoice import InvoiceService
@@ -23,6 +24,7 @@ class ShopApplication:
         self.auth = AuthService()
         self.audit = AuditTrail()
         self.cart = CartService()
+        self.preview_cache = PricingCache()
         self.inventory = InventoryService()
         self.pricing = PricingService()
         self.payments = PaymentService()
@@ -50,6 +52,11 @@ class ShopApplication:
         shipping_country: str,
         promotion_code: str | None = None,
     ) -> dict[str, object]:
+        cache_key = self.preview_cache.build_key(cart_items=cart_items, shipping_country=shipping_country, promotion_code=promotion_code)
+        cached_preview = self.preview_cache.get(cache_key)
+        if cached_preview is not None:
+            return cached_preview
+
         cart_summary = self.cart.summarize(cart_items)
         shipping_quote = self.shipping.quote(shipping_country=shipping_country, item_count=cart_summary.item_count)
         breakdown = self.pricing.calculate(
@@ -58,7 +65,7 @@ class ShopApplication:
             shipping_fee=shipping_quote.fee,
             promotion_code=promotion_code,
         )
-        return {
+        preview = {
             "item_count": cart_summary.item_count,
             "subtotal": breakdown.subtotal,
             "shipping_fee": breakdown.shipping_fee,
@@ -67,6 +74,8 @@ class ShopApplication:
             "shipping_method": shipping_quote.method,
             "eta_days": shipping_quote.eta_days,
         }
+        self.preview_cache.set(cache_key, preview)
+        return preview
 
     def checkout(
         self,
