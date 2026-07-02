@@ -39,11 +39,16 @@ class ShopApplication:
         cart_items: list[CartItem],
         shipping_country: str,
         payment_method: str,
+        promotion_code: str | None = None,
     ) -> CheckoutResult:
         validate_email(email)
         validate_cart_items(cart_items)
         self.inventory.reserve(cart_items)
-        breakdown = self.pricing.calculate(cart_items=cart_items, shipping_country=shipping_country)
+        breakdown = self.pricing.calculate(
+            cart_items=cart_items,
+            shipping_country=shipping_country,
+            promotion_code=promotion_code,
+        )
 
         order_id = stable_identifier(customer_id, email, current_timestamp())
         transaction_id = stable_identifier(order_id, payment_method, "payment")
