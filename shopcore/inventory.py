@@ -28,3 +28,10 @@ class InventoryService:
     def release(self, items: list[CartItem]) -> None:
         for item in items:
             self._available[item.sku] += item.quantity
+
+    def low_stock_skus(self, threshold: int = 2) -> list[str]:
+        low_stock = []
+        for sku, quantity in self._available.items():
+            if quantity <= threshold:
+                low_stock.append(sku)
+        return sorted(low_stock)

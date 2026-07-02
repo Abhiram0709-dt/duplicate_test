@@ -56,3 +56,13 @@ def calculate_tax_renamed(base_amount: Decimal) -> Decimal:
     computed_tax = base_amount * Decimal("0.07")
     normalized_tax = money(computed_tax)
     return normalized_tax
+
+
+def calculate_service_tax(amount: Decimal) -> Decimal:
+    tax_amount = amount * Decimal("0.07")
+    return money(tax_amount)
+
+
+def calculate_service_tax_copy(amount: Decimal) -> Decimal:
+    tax_amount = amount * Decimal("0.07")
+    return money(tax_amount)
