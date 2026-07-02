@@ -42,6 +42,30 @@ class ShopApplication:
     def authenticate(self, email: str, password: str) -> str:
         return self.auth.authenticate(email=email, password=password)
 
+    def preview_checkout(
+        self,
+        cart_items: list[CartItem],
+        shipping_country: str,
+        promotion_code: str | None = None,
+    ) -> dict[str, object]:
+        cart_summary = self.cart.summarize(cart_items)
+        shipping_quote = self.shipping.quote(shipping_country=shipping_country, item_count=cart_summary.item_count)
+        breakdown = self.pricing.calculate(
+            cart_items=cart_items,
+            shipping_country=shipping_country,
+            shipping_fee=shipping_quote.fee,
+            promotion_code=promotion_code,
+        )
+        return {
+            "item_count": cart_summary.item_count,
+            "subtotal": breakdown.subtotal,
+            "shipping_fee": breakdown.shipping_fee,
+            "tax": breakdown.tax,
+            "grand_total": breakdown.grand_total,
+            "shipping_method": shipping_quote.method,
+            "eta_days": shipping_quote.eta_days,
+        }
+
     def checkout(
         self,
         customer_id: str,
