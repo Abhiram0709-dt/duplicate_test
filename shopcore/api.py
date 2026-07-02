@@ -7,6 +7,7 @@ from .inventory import InventoryService
 from .models import CartItem, CheckoutResult, Order, PaymentResult, Product, User
 from .pricing import PricingService
 from .payment import PaymentService
+from .notification import NotificationService
 from .shipping import ShippingService
 from .utils import current_timestamp, money, stable_identifier
 from .validators import validate_cart_items, validate_email
@@ -21,6 +22,7 @@ class ShopApplication:
         self.pricing = PricingService()
         self.payments = PaymentService()
         self.shipping = ShippingService()
+        self.notifications = NotificationService()
 
     def seed_product(self, product: Product) -> None:
         self.products[product.sku] = product
@@ -76,4 +78,6 @@ class ShopApplication:
                 "shipping_method": shipping_quote.method,
             },
         )
+        self.notifications.send_confirmation(email=email, order_id=order_id, invoice_number=invoice_number)
         return CheckoutResult(order=order, payment=payment, invoice_number=invoice_number)
+
