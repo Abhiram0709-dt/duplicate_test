@@ -61,3 +61,18 @@ def count_cart_items_with_while(items: list[str]) -> int:
         count += 1
         index += 1
     return count
+
+
+def count_items_recursive(items: list[str], position: int = 0) -> int:
+    if position >= len(items):
+        return 0
+    return 1 + count_items_recursive(items, position + 1)
+
+
+def count_items_iterative(items: list[str]) -> int:
+    remaining = list(items)
+    total = 0
+    while remaining:
+        remaining.pop()
+        total += 1
+    return total
