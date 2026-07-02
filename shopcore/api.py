@@ -7,6 +7,7 @@ from .inventory import InventoryService
 from .models import CartItem, CheckoutResult, Order, PaymentResult, Product, User
 from .pricing import PricingService
 from .payment import PaymentService
+from .shipping import ShippingService
 from .utils import current_timestamp, money, stable_identifier
 from .validators import validate_cart_items, validate_email
 
@@ -19,6 +20,7 @@ class ShopApplication:
         self.inventory = InventoryService()
         self.pricing = PricingService()
         self.payments = PaymentService()
+        self.shipping = ShippingService()
 
     def seed_product(self, product: Product) -> None:
         self.products[product.sku] = product
@@ -46,9 +48,11 @@ class ShopApplication:
         validate_email(email)
         validate_cart_items(cart_items)
         self.inventory.reserve(cart_items)
+        shipping_quote = self.shipping.quote(shipping_country=shipping_country, item_count=len(cart_items))
         breakdown = self.pricing.calculate(
             cart_items=cart_items,
             shipping_country=shipping_country,
+            shipping_fee=shipping_quote.fee,
             promotion_code=promotion_code,
         )
 
@@ -69,6 +73,7 @@ class ShopApplication:
             metadata={
                 "shipping_country": shipping_country,
                 "payment_method": payment_method,
+                "shipping_method": shipping_quote.method,
             },
         )
         return CheckoutResult(order=order, payment=payment, invoice_number=invoice_number)

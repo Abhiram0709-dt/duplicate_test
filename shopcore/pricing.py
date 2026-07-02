@@ -24,12 +24,16 @@ class PricingService:
         self,
         cart_items: list[CartItem],
         shipping_country: str,
+        shipping_fee: float | Decimal | None = None,
         promotion_code: str | None = None,
     ) -> PriceBreakdown:
         subtotal = sum((item.line_total for item in cart_items), start=Decimal("0.00"))
         discount = self.discounts.discount_for(cart_items=cart_items, promotion_code=promotion_code)
         discounted_subtotal = subtotal - discount
-        shipping_fee = money("5.00" if shipping_country == "US" else "15.00")
+        if shipping_fee is None:
+            shipping_fee = money("5.00" if shipping_country == "US" else "15.00")
+        else:
+            shipping_fee = money(shipping_fee)
         tax = money(discounted_subtotal * Decimal("0.07"))
         grand_total = money(discounted_subtotal + shipping_fee + tax)
         return PriceBreakdown(
