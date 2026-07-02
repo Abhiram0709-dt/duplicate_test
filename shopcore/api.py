@@ -5,6 +5,7 @@ from decimal import Decimal
 from .auth import AuthService
 from .inventory import InventoryService
 from .models import CartItem, CheckoutResult, Order, PaymentResult, Product, User
+from .invoice import InvoiceService
 from .pricing import PricingService
 from .payment import PaymentService
 from .notification import NotificationService
@@ -23,6 +24,7 @@ class ShopApplication:
         self.payments = PaymentService()
         self.shipping = ShippingService()
         self.notifications = NotificationService()
+        self.invoices = InvoiceService()
 
     def seed_product(self, product: Product) -> None:
         self.products[product.sku] = product
@@ -60,7 +62,7 @@ class ShopApplication:
 
         order_id = stable_identifier(customer_id, email, current_timestamp())
         payment = self.payments.capture(order_id=order_id, amount=breakdown.grand_total, payment_method=payment_method)
-        invoice_number = f"INV-{order_id.upper()}"
+        invoice_number = self.invoices.generate(order_id=order_id)
 
         order = Order(
             order_id=order_id,
