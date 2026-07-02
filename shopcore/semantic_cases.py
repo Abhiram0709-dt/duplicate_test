@@ -76,3 +76,15 @@ def count_items_iterative(items: list[str]) -> int:
         remaining.pop()
         total += 1
     return total
+
+
+def collect_sku_prefixes_with_comprehension(skus: list[str]) -> list[str]:
+    return [sku[:3] for sku in skus if sku]
+
+
+def collect_sku_prefixes_with_loop(skus: list[str]) -> list[str]:
+    prefixes: list[str] = []
+    for sku in skus:
+        if sku:
+            prefixes.append(sku[:3])
+    return prefixes
