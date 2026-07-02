@@ -13,3 +13,8 @@ def calculate_invoice_total(subtotal: Decimal, tax_rate: Decimal, shipping_fee: 
 def calculate_invoice_total_copy(subtotal: Decimal, tax_rate: Decimal, shipping_fee: Decimal) -> Decimal:
     tax_amount = subtotal * tax_rate
     return money(subtotal + tax_amount + shipping_fee)
+
+
+def calculate_invoice_total_renamed(amount_before_tax: Decimal, rate: Decimal, freight_cost: Decimal) -> Decimal:
+    computed_tax = amount_before_tax * rate
+    return money(amount_before_tax + computed_tax + freight_cost)
