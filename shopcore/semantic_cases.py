@@ -39,3 +39,9 @@ def calculate_invoice_total_with_helpers(subtotal: Decimal, tax_rate: Decimal, s
     tax_amount = _tax_component(subtotal, tax_rate)
     merged_total = _merge_invoice_total(subtotal, shipping_fee, tax_amount)
     return money(merged_total)
+
+
+def calculate_invoice_total_different_form(subtotal: Decimal, tax_rate: Decimal, shipping_fee: Decimal) -> Decimal:
+    multiplier = Decimal("1.00") + tax_rate
+    taxed_subtotal = subtotal * multiplier
+    return money(taxed_subtotal + shipping_fee)
