@@ -34,7 +34,7 @@ class PricingService:
             shipping_fee = money("5.00" if shipping_country == "US" else "15.00")
         else:
             shipping_fee = money(shipping_fee)
-        tax = money(discounted_subtotal * Decimal("0.07"))
+        tax = calculate_tax(discounted_subtotal)
         grand_total = money(discounted_subtotal + shipping_fee + tax)
         return PriceBreakdown(
             subtotal=money(discounted_subtotal),
@@ -42,3 +42,11 @@ class PricingService:
             tax=tax,
             grand_total=grand_total,
         )
+
+
+def calculate_tax(amount: Decimal) -> Decimal:
+    return money(amount * Decimal("0.07"))
+
+
+def calculate_tax_copy(amount: Decimal) -> Decimal:
+    return money(amount * Decimal("0.07"))
