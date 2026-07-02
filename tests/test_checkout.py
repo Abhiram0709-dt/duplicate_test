@@ -36,6 +36,7 @@ class CheckoutTests(unittest.TestCase):
             ],
             shipping_country="US",
             payment_method="card",
+            gift_message="Happy birthday",
         )
 
         self.assertTrue(result.payment.approved)

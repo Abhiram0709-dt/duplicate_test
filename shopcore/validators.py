@@ -7,6 +7,7 @@ from .models import CartItem
 
 
 EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+PHONE_PATTERN = re.compile(r"^\+?[0-9][0-9\-\s]{6,18}$")
 
 
 class ValidationError(ValueError):
@@ -27,3 +28,13 @@ def validate_cart_items(items: list[CartItem]) -> None:
             raise ValidationError(f"Invalid quantity for {item.sku}")
         if item.unit_price < Decimal("0.00"):
             raise ValidationError(f"Invalid price for {item.sku}")
+
+
+def validate_phone_number(phone_number: str) -> None:
+    if not PHONE_PATTERN.match(phone_number):
+        raise ValidationError(f"Invalid phone number: {phone_number}")
+
+
+def validate_phone_number_copy(phone_number: str) -> None:
+    if not PHONE_PATTERN.match(phone_number):
+        raise ValidationError(f"Invalid phone number: {phone_number}")

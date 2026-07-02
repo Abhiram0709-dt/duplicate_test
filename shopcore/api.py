@@ -85,6 +85,7 @@ class ShopApplication:
         shipping_country: str,
         payment_method: str,
         promotion_code: str | None = None,
+        gift_message: str | None = None,
     ) -> CheckoutResult:
         validate_email(email)
         validate_cart_items(cart_items)
@@ -117,6 +118,7 @@ class ShopApplication:
                 "payment_method": payment_method,
                 "shipping_method": shipping_quote.method,
                 "item_count": cart_summary.item_count,
+                "gift_message": gift_message or "",
             },
         )
         self.notifications.send_confirmation(email=email, order_id=order_id, invoice_number=invoice_number)
